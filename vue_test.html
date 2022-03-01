@@ -7,19 +7,17 @@
         window.addEventListener('DOMContentLoaded', (event) => {
 
             const vueTasks = Vue.createApp({
-                data(){
-                    return {tasks:[
-                        'aaaa','bbbbb','ccccc'
-                    ]};
+                data() {
+                    return {
+                        tasks: [
+                            'aaaa', 'bbbbb', 'ccccc'
+                        ]
+                    };
                 }
 
 
             });
             vueTasks.component('blog-post', {
-                props: ['title'],
-                template: `<h4 style="color:red">{{ title }}</h4>`
-            });
-            vueTasks.component('blog-post2', {
                 props: ['title'],
                 template: `<tr><td style="color:blue">{{title}}</td></tr>`
             });
@@ -29,14 +27,11 @@
 </head>
 
 <body>
-    <div id="tasks">
-        <blog-post title="hoge"></blog-post>
-        <table>
-            <tbody>
-                <blog-post2 v-for="curTask in tasks" :title="curTask"></blog-post2>
-            </tbody>
-        </table>
-    </div>
+    <table id="tasks">
+        <tbody>
+            <tr is="vue:blog-post" v-for="curTask in tasks" :title="curTask" />
+        </tbody>
+    </table>
 </body>
 
 </html>

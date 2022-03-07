@@ -1,0 +1,274 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <script src="https://cdn.tailwindcss.com"></script>
+
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css"
+        integrity="sha512-Fo3rlrZj/k7ujTnHg4CGR2D7kSs0v4LLanw2qksYuRlEzO+tcaEPQogQ0KaoGN26/zrn20ImR1DfuLWnOo7aBA=="
+        crossorigin="anonymous" referrerpolicy="no-referrer" />
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/dayjs/1.10.7/dayjs.min.js"
+        integrity="sha512-bwD3VD/j6ypSSnyjuaURidZksoVx3L1RPvTkleC48SbHCZsemT3VKMD39KknPnH728LLXVMTisESIBOAb5/W0Q=="
+        crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+
+    <script src="https://unpkg.com/vue@next"></script>
+    <script>
+        window.addEventListener('DOMContentLoaded', (event) => {
+
+            const vueTasks = Vue.createApp({
+                data() {
+                    return {
+                        tasks: [
+                            {
+                                name: 'LUAライセンス対応1',
+                                persons: ['中', '山'],
+                                periodStart: '2022-11-11',
+                                periodEnd: '2022-12-12',
+                                progress: 8,
+                                comments: [
+                                    {
+                                        date: '2022-11-11',
+                                        progress: 10,
+                                        status: 'progress',
+                                        person: '中',
+                                        comment: '現在対応中'
+                                    }
+                                ]
+                            },
+                            {
+                                name: 'LUAライセンス対応2',
+                                persons: ['中', '山'],
+                                periodStart: '2022-11-11',
+                                periodEnd: '2022-12-12',
+                                progress: 8,
+                                comments: [
+                                    {
+                                        date: '2022-11-11',
+                                        progress: 52,
+                                        status: 'progress',
+                                        person: '中',
+                                        comment: '現在対応中'
+                                    }
+                                ]
+                            },
+                            {
+                                name: 'LUAライセンス対応3',
+                                persons: ['中', '山'],
+                                periodStart: '2022-11-11',
+                                periodEnd: '2022-12-12',
+                                progress: 8,
+                                comments: [
+                                    {
+                                        date: '2022-11-11',
+                                        progress: 30,
+                                        status: 'progress',
+                                        person: '中',
+                                        comment: '現在対応中'
+                                    }
+                                ]
+                            },
+                            {
+                                name: 'LUAライセンス対応4',
+                                persons: ['中', '山'],
+                                periodStart: '2022-11-11',
+                                periodEnd: '2022-12-12',
+                                progress: 8,
+                                comments: [
+                                    {
+                                        date: '2022-11-11',
+                                        progress: 80,
+                                        status: 'completed',
+                                        person: '中',
+                                        comment: '現在対応中'
+                                    }
+                                ]
+                            }
+                        ],
+                        status: [
+                            'progress',
+                            'hold',
+                            'completed'
+                        ],
+                        inputTask: {
+                            name: '',
+                            person: '',
+                            periodStart: '',
+                            periodEnd: ''
+                        },
+                        btkTask: {
+                        },
+                        showRegistRow: false
+                    }
+                },
+                methods: {
+                    registTask() {
+                        this.tasks.unshift(
+                            {
+                                name: this.inputTask.name,
+                                persons: [this.inputTask.person],
+                                progress: 0,
+                                comment: '',
+                                periodStart: this.inputTask.periodStart,
+                                periodEnd: this.inputTask.periodEnd
+                            }
+                        );
+                        this.inputTask = {
+                            name: '',
+                            person: '',
+                            periodStart: '',
+                            periodEnd: ''
+                        };
+                        this.showRegistRow = false;
+                    },
+                    editTask(task) {
+
+                    },
+                    cancelEditTask(task) {
+                        task.name = this.btkTask.name;
+                        task.persons = this.btkTask.persons;
+                        task.periodStart = this.btkTask.periodStart;
+                        task.periodEnd = this.btkTask.periodEnd;
+                        task.isEdit = false;
+                    },
+                    format(curDate) {
+                        return dayjs(curDate).format('YYYY/MM/DD')
+                    }
+                },
+                created: function () {
+                    this.$data.tasks.forEach(curTask => curTask.inputTask = {});
+                },
+                mounted: () => {
+                }
+            }).mount('#tasks');
+        });
+    </script>
+</head>
+
+<body class="antialiased font-sans bg-gray-200">
+    <main class="container mx-auto px-4 sm:px-8 py-8">
+        <h2 class="text-2xl font-semibold leading-tight">CC-Voice</h2>
+        <div class="my-2 flex sm:flex-row flex-col">
+            <div class="flex flex-row mb-1 sm:mb-0">
+                <div class="relative">
+                    <select
+                        class="appearance-none h-full rounded-l border-t sm:rounded-r-none sm:border-r-0 border-r border-b block appearance-none w-full bg-white border-gray-400 text-gray-700 py-2 px-4 pr-8 leading-tight focus:outline-none focus:border-l focus:border-r focus:bg-white focus:border-gray-500">
+                        <option>All</option>
+                        <option>Active</option>
+                        <option>Inactive</option>
+                    </select>
+                    <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-gray-700">
+                        <svg class="fill-current h-4 w-4" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20">
+                            <path d="M9.293 12.95l.707.707L15.657 8l-1.414-1.414L10 10.828 5.757 6.586 4.343 8z" />
+                        </svg>
+                    </div>
+                </div>
+            </div>
+            <div class="block relative">
+                <span class="h-full absolute inset-y-0 left-0 flex items-center pl-2">
+                    <svg viewBox="0 0 24 24" class="h-4 w-4 fill-current text-gray-500">
+                        <path
+                            d="M10 4a6 6 0 100 12 6 6 0 000-12zm-8 6a8 8 0 1114.32 4.906l5.387 5.387a1 1 0 01-1.414 1.414l-5.387-5.387A8 8 0 012 10z">
+                        </path>
+                    </svg>
+                </span>
+                <input placeholder="Search"
+                    class="appearance-none rounded-r rounded-l sm:rounded-l-none border border-gray-400 border-b block pl-8 pr-6 py-2 w-full bg-white text-sm placeholder-gray-400 text-gray-700 focus:bg-white focus:placeholder-gray-600 focus:text-gray-700 focus:outline-none" />
+            </div>
+        </div>
+        <div class="inline-block min-w-full shadow rounded-lg overflow-hidden">
+            <table class="min-w-full leading-normal table-fixed" id="tasks">
+                <thead>
+                    <tr>
+                        <th
+                            class="px-5 border-b-2 border-gray-200 bg-gray-100 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider w-64">
+                            Task
+                        </th>
+                        <th
+                            class="px-5 border-b-2 border-gray-200 bg-gray-100 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
+                            Supervisor
+                        </th>
+                        <th
+                            class="px-5 border-b-2 border-gray-200 bg-gray-100 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
+                            Period
+                        </th>
+                        <th
+                            class="px-5 py-3 border-b-2 border-gray-200 bg-gray-100 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
+                            Status
+                        </th>
+                        <th
+                            class="px-5 py-3 border-b-2 border-gray-200 bg-gray-100 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
+                            Progress
+                        </th>
+                        <th
+                            class="px-5 py-3 border-b-2 border-gray-200 bg-gray-100 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
+                        </th>
+                    </tr>
+                </thead>
+                <tbody v-for="curTask in tasks">
+                    <tr>
+                        <td v-show="!curTask.inputTask.isEditTask"
+                            class="px-5 border-b border-gray-200 bg-white text-sm group relative">
+                            <p class="text-gray-900 whitespace-no-wrap">
+                                {{ curTask.name }}
+                            </p>
+                            <i @click="curTask.inputTask.isEditTask = true"
+                                class="cursor-pointer text-gray-900 absolute top-2 right-4
+                                        group-hover:visible invisible
+                                        fa-solid fa-pen-to-square"></i>
+                        </td>
+                        <td v-show="curTask.inputTask.isEditTask"
+                            class="px-5 border-b border-gray-200 bg-white text-sm">
+                            <input class="shadow appearance-none border rounded w-full text-gray-700
+                                            focus:outline-none focus:shadow-md" type="text" placeholder="taskname">
+                        </td>
+                        <td class="px-5 border-b border-gray-200 bg-white text-sm">
+                            <p class="text-gray-900 whitespace-no-wrap">Admin</p>
+                        </td>
+                        <td class="px-5 py-5 border-b border-gray-200 bg-white text-sm">
+                            <p class="text-gray-900 whitespace-no-wrap">
+                                {{ format(curTask.periodStart) }} - {{ format(curTask.periodEnd) }}
+                            </p>
+                        </td>
+                        <td class="px-5 py-5 border-b border-gray-200 bg-white text-sm">
+                            <span class="relative inline-block px-3 py-1 font-semibold text-green-900 leading-tight">
+                                <span aria-hidden class="absolute inset-0 bg-green-200 opacity-50 rounded-full"></span>
+                                <span class="relative">Active</span>
+                            </span>
+                        </td>
+                        <td class="px-5 py-5 border-b border-gray-200 bg-white text-sm">
+                            <div class="w-full bg-gray-200 rounded-full dark:bg-gray-700">
+                                <div class="bg-red-700 text-xs font-medium text-white text-center p-0.5 leading-none rounded-full"
+                                    :style="{ width: (curTask.comments?curTask.comments[0].progress:'0') + '%' }">
+                                    {{ curTask.comments?curTask.comments[0].progress:'0' }}%
+                                </div>
+                            </div>
+                        </td>
+                        <td class="px-5 py-5 border-b border-gray-200 bg-white text-sm">
+                            <i class="cursor-pointer fa-solid fa-clock-rotate-left"></i>
+                        </td>
+                    </tr>
+
+                </tbody>
+            </table>
+            <div
+                class="px-5 py-5 bg-white border-t flex flex-col xs:flex-row items-center xs:justify-between          ">
+                <span class="text-xs xs:text-sm text-gray-900">
+                    Showing 1 to 4 of 50 Entries
+                </span>
+                <div class="inline-flex mt-2 xs:mt-0">
+                    <button
+                        class="text-sm bg-gray-300 hover:bg-gray-400 text-gray-800 font-semibold py-2 px-4 rounded-l">
+                        Prev
+                    </button>
+                    <button
+                        class="text-sm bg-gray-300 hover:bg-gray-400 text-gray-800 font-semibold py-2 px-4 rounded-r">
+                        Next
+                    </button>
+                </div>
+            </div>
+        </div>
+    </main>
+</body>
+
+</html>

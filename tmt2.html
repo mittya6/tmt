@@ -12,7 +12,16 @@
         integrity="sha512-bwD3VD/j6ypSSnyjuaURidZksoVx3L1RPvTkleC48SbHCZsemT3VKMD39KknPnH728LLXVMTisESIBOAb5/W0Q=="
         crossorigin="anonymous" referrerpolicy="no-referrer"></script>
 
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/AlertifyJS/1.13.1/alertify.min.js"
+        integrity="sha512-JnjG+Wt53GspUQXQhc+c4j8SBERsgJAoHeehagKHlxQN+MtCCmFDghX9/AcbkkNRZptyZU4zC8utK59M5L45Iw=="
+        crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/AlertifyJS/1.13.1/css/alertify.min.css"
+        integrity="sha512-IXuoq1aFd2wXs4NqGskwX2Vb+I8UJ+tGJEu/Dc0zwLNKeQ7CW3Sr6v0yU3z5OQWe3eScVIkER4J9L7byrgR/fA=="
+        crossorigin="anonymous" referrerpolicy="no-referrer" />
+
     <script src="https://unpkg.com/vue@next"></script>
+
+    <!-- modal Select Persons -->
     <script>
         window.addEventListener('DOMContentLoaded', (event) => {
 
@@ -96,9 +105,26 @@
                             periodStart: '',
                             periodEnd: ''
                         },
-                        btkTask: {
-                        },
-                        showRegistRow: false
+                        persons: [
+                            {
+                                name: '山',
+                                txt_color: '#e66465',
+                                bg_color: '#f6b73c',
+                                isDisabled: true
+                            },
+                            {
+                                name: '谷',
+                                txt_color: '#0000ff',
+                                bg_color: '#00ff00',
+                                isDisabled: true
+                            },
+                            {
+                                name: '中',
+                                txt_color: '#ff00ff',
+                                bg_color: '#00ff00',
+                                isDisabled: true
+                            }
+                        ]
                     }
                 },
                 methods: {
@@ -121,15 +147,35 @@
                         };
                         this.showRegistRow = false;
                     },
-                    editTask(task) {
-
+                    editTask(task, flagname) {
+                        task.inputTask.name = task.name;
+                        task.inputTask.persons = task.persons;
+                        task.inputTask.periodStart = task.periodStart;
+                        task.inputTask.periodEnd = task.periodEnd;
+                        task.inputTask[flagname] = true;
                     },
-                    cancelEditTask(task) {
-                        task.name = this.btkTask.name;
-                        task.persons = this.btkTask.persons;
-                        task.periodStart = this.btkTask.periodStart;
-                        task.periodEnd = this.btkTask.periodEnd;
-                        task.isEdit = false;
+                    cancelEditTask(task, flagname) {
+                        task.inputTask[flagname] = false;
+                        alertify.error('Canceled');
+                    },
+                    editedTask(task, flagname) {
+                        task.name = task.inputTask.name;
+                        task.persons = task.inputTask.persons;
+                        task.periodStart = task.inputTask.periodStart;
+                        task.periodEnd = task.inputTask.periodEnd;
+                        task.inputTask[flagname] = false;
+                        alertify.success('Edited!');
+                    },
+                    deletedTask(index) {
+                        const tarTasks = this.tasks;
+                        alertify.confirm(`Are you sure you want delete ${tarTasks[index].name} ?`,
+                            function () {
+                                tarTasks.splice(index, 1);
+                                alertify.success('Deleted');
+                            },
+                            function () {
+                                alertify.error('Canceled');
+                            });
                     },
                     format(curDate) {
                         return dayjs(curDate).format('YYYY/MM/DD')
@@ -137,11 +183,67 @@
                 },
                 created: function () {
                     this.$data.tasks.forEach(curTask => curTask.inputTask = {});
-                },
-                mounted: () => {
                 }
-            }).mount('#tasks');
+            });
+            vueTasks.component('selected-persons', {
+                props: {
+                    persons: Object,
+                    inputTask: Object
+                },
+                template: `#selected-persons`
+            });
+            vueTasks.mount('#tasks');
         });
+
+        toggle = (selector) => {
+            let target = document.querySelector(selector);
+            ['invisible', 'opacity-100', 'visible', 'opacity-0'].forEach((curClass) => {
+                target.classList.toggle(curClass);
+            });
+        }
+    </script>
+    <script type="text/x-template" id="selected-persons">
+        <aside  @click="$emit('close')"
+            class="block flex justify-center items-center
+        fixed top-0 left-0 w-screen h-screen bg-gray-400/70 duration-500 ease-out z-50">
+        <div onclick="event.stopPropagation()"
+            class="p-4 max-w-md bg-white rounded-lg border shadow-md sm:p-8 dark:bg-gray-800 dark:border-gray-700">
+            <div class="flex justify-between items-center mb-4">
+                <h3 class="text-xl font-bold leading-none text-gray-900 dark:text-white">
+                    Select Persons {{ title }}
+                </h3>
+                <i class="cursor-pointer fa-solid fa-rectangle-xmark"></i>
+                <i class="cursor-pointer ml-2 fa-solid fa-floppy-disk"></i>
+            </div>
+            <div class="flow-root">
+                <ul role="list" class="divide-y divide-gray-200 dark:divide-gray-700">
+                    <li v-for="curPerson in persons" class="py-3 sm:py-4">
+                        <label class="block flex items-center space-x-4">
+                            <div class="flex-shrink-0">
+                                <div class="h-8 w-8 rounded-full bg-white flex justify-center items-center"
+                                    :style="{backgroundColor: curPerson.bg_color}">
+                                    <span class="text-xl" :style="{color: curPerson.txt_color}">
+                                        {{ curPerson.name }}
+                                    </span>
+                                </div>
+                            </div>
+                            <div
+                                class="inline-flex items-center text-base font-semibold text-gray-900 dark:text-white">
+                                <input type="checkbox" />
+                            </div>
+                            <div class="flex-1 min-w-0">
+                                <button
+                                    class="bg-red-500  h-8 w-16 text-center text-sm shadow-sm font-medium tracking-wider text-red-100 rounded-full hover:shadow-2xl hover:bg-red-600">
+                                    Active
+                                </button>
+                            </div>
+                        </label>
+                    </li>
+
+                </ul>
+            </div>
+        </div>
+    </aside>
     </script>
 </head>
 
@@ -156,6 +258,7 @@
                         <option>All</option>
                         <option>Active</option>
                         <option>Inactive</option>
+                        <option>Completed</option>
                     </select>
                     <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-gray-700">
                         <svg class="fill-current h-4 w-4" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20">
@@ -176,8 +279,9 @@
                     class="appearance-none rounded-r rounded-l sm:rounded-l-none border border-gray-400 border-b block pl-8 pr-6 py-2 w-full bg-white text-sm placeholder-gray-400 text-gray-700 focus:bg-white focus:placeholder-gray-600 focus:text-gray-700 focus:outline-none" />
             </div>
         </div>
-        <div class="inline-block min-w-full shadow rounded-lg overflow-hidden">
-            <table class="min-w-full leading-normal table-fixed" id="tasks">
+        <div class="inline-block min-w-full shadow rounded-lg overflow-hidden" id="tasks">
+
+            <table class="min-w-full leading-normal table-fixed">
                 <thead>
                     <tr>
                         <th
@@ -189,7 +293,7 @@
                             Supervisor
                         </th>
                         <th
-                            class="px-5 border-b-2 border-gray-200 bg-gray-100 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
+                            class="px-5 border-b-2 border-gray-200 bg-gray-100 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider w-80">
                             Period
                         </th>
                         <th
@@ -205,30 +309,70 @@
                         </th>
                     </tr>
                 </thead>
-                <tbody v-for="curTask in tasks">
+                <tbody v-for="(curTask, index) in tasks">
                     <tr>
-                        <td v-show="!curTask.inputTask.isEditTask"
+                        <!-- taskaname ref-->
+                        <td v-show="!curTask.inputTask.isEditTaskname"
                             class="px-5 border-b border-gray-200 bg-white text-sm group relative">
                             <p class="text-gray-900 whitespace-no-wrap">
                                 {{ curTask.name }}
                             </p>
-                            <i @click="curTask.inputTask.isEditTask = true"
-                                class="cursor-pointer text-gray-900 absolute top-2 right-4
+                            <i @click="editTask(curTask, 'isEditTaskname')" class="cursor-pointer text-gray-900 absolute top-2 right-4
                                         group-hover:visible invisible
                                         fa-solid fa-pen-to-square"></i>
                         </td>
-                        <td v-show="curTask.inputTask.isEditTask"
-                            class="px-5 border-b border-gray-200 bg-white text-sm">
-                            <input class="shadow appearance-none border rounded w-full text-gray-700
-                                            focus:outline-none focus:shadow-md" type="text" placeholder="taskname">
+                        <!-- taskaname edit-->
+                        <td v-show="curTask.inputTask.isEditTaskname"
+                            class="px-5 border-b border-gray-200 bg-white text-sm relative">
+                            <input class="shadow appearance-none border rounded w-full text-gray-700 
+                                            focus:outline-none focus:shadow-md" v-model="curTask.inputTask.name"
+                                type="text" placeholder="taskname">
+                            <div class="flex absolute top-2 right-4 text-base">
+                                <i @click="cancelEditTask(curTask, 'isEditTaskname')"
+                                    class="cursor-pointer fa-solid fa-rectangle-xmark"></i>
+                                <i @click="editedTask(curTask, 'isEditTaskname')"
+                                    class="cursor-pointer ml-2 fa-solid fa-floppy-disk"></i>
+                            </div>
                         </td>
-                        <td class="px-5 border-b border-gray-200 bg-white text-sm">
+                        <!-- persons ref -->
+                        <td v-show="!curTask.inputTask.isEditTaskPersons"
+                            class="px-5 border-b border-gray-200 bg-white text-sm group relative">
                             <p class="text-gray-900 whitespace-no-wrap">Admin</p>
+                            <i @click="editTask(curTask, 'isEditTaskPersons')" class="cursor-pointer text-gray-900 absolute top-2 right-4
+                                        group-hover:visible invisible
+                                        fa-solid fa-pen-to-square"></i>
                         </td>
-                        <td class="px-5 py-5 border-b border-gray-200 bg-white text-sm">
+                        <!-- persons edit -->
+                        <td v-show="curTask.inputTask.isEditTaskPersons">
+                            <selected-persons v-show="curTask.inputTask.isEditTaskPersons" :persons="persons"
+                                :inputTask="curTask.inputTask" @close="cancelEditTask(curTask, 'isEditTaskPersons')" />
+                        </td>
+                        <!-- period ref-->
+                        <td v-show="!curTask.inputTask.isEditPeriod"
+                            class="px-5 py-5 border-b border-gray-200 bg-white text-sm group relative">
                             <p class="text-gray-900 whitespace-no-wrap">
                                 {{ format(curTask.periodStart) }} - {{ format(curTask.periodEnd) }}
                             </p>
+                            <i @click="editTask(curTask, 'isEditPeriod')" class="cursor-pointer text-gray-900 absolute top-2 right-4
+                                        group-hover:visible invisible
+                                        fa-solid fa-pen-to-square"></i>
+                        </td>
+                        <!-- period edit-->
+                        <td v-show="curTask.inputTask.isEditPeriod"
+                            class="px-5 py-5 border-b border-gray-200 bg-white text-sm relative whitespace-no-wrap">
+                            <input class="shadow appearance-none border roundedtext-gray-700 w-32 appearance-none
+                                            focus:outline-none focus:shadow-md" v-model="curTask.inputTask.periodStart"
+                                type="date" placeholder="taskname">
+                            -
+                            <input class="shadow appearance-none border rounded text-gray-700 w-32
+                                        focus:outline-none focus:shadow-md" v-model="curTask.inputTask.periodEnd"
+                                type="date" placeholder="taskname">
+                            <div class="flex absolute top-2 right-4 text-base">
+                                <i @click="cancelEditTask(curTask, 'isEditPeriod')"
+                                    class="cursor-pointer fa-solid fa-rectangle-xmark"></i>
+                                <i @click="editedTask(curTask, 'isEditPeriod')"
+                                    class="cursor-pointer ml-2 fa-solid fa-floppy-disk"></i>
+                            </div>
                         </td>
                         <td class="px-5 py-5 border-b border-gray-200 bg-white text-sm">
                             <span class="relative inline-block px-3 py-1 font-semibold text-green-900 leading-tight">
@@ -245,12 +389,15 @@
                             </div>
                         </td>
                         <td class="px-5 py-5 border-b border-gray-200 bg-white text-sm">
-                            <i class="cursor-pointer fa-solid fa-clock-rotate-left"></i>
+                            <div class="flex flex-row">
+                                <i class="cursor-pointer fa-solid fa-clock-rotate-left"></i>
+                                <i @click="deletedTask(index)" class="ml-4 cursor-pointer fa-solid fa-trash-can"></i>
+                            </div>
                         </td>
                     </tr>
-
                 </tbody>
             </table>
+
             <div
                 class="px-5 py-5 bg-white border-t flex flex-col xs:flex-row items-center xs:justify-between          ">
                 <span class="text-xs xs:text-sm text-gray-900">
@@ -267,8 +414,26 @@
                     </button>
                 </div>
             </div>
+
+
+
         </div>
     </main>
+
+    <footer class="flex justify-end fixed w-screen bottom-12">
+        <button onclick=""
+            class="mr-8 border-t-2 border-b-2 border-black hover:border-gray-300 hover:text-gray-600 px-1">
+            <i class="fa-solid fa-download"></i>
+            <span class="ml-2">SAVE</span>
+        </button>
+        <button onclick=""
+            class="mr-8 border-t-2 border-b-2 border-black hover:border-gray-300 hover:text-gray-600 px-1">
+            <i class="fa-solid fa-upload"></i>
+            <span class="ml-2">LOAD</span>
+        </button>
+    </footer>
+
+
 </body>
 
 </html>

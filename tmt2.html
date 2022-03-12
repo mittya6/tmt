@@ -28,13 +28,13 @@
             const vueTasks = Vue.createApp({
                 data() {
                     return {
+                        title: 'CC-Voice',
                         tasks: [
                             {
                                 name: 'LUAライセンス対応1',
                                 persons: ['中', '山'],
                                 periodStart: '2022-11-11',
                                 periodEnd: '2022-12-12',
-                                progress: 8,
                                 comments: [
                                     {
                                         date: '2022-11-11',
@@ -50,7 +50,6 @@
                                 persons: ['中', '山'],
                                 periodStart: '2022-11-11',
                                 periodEnd: '2022-12-12',
-                                progress: 8,
                                 comments: [
                                     {
                                         date: '2022-11-11',
@@ -66,7 +65,6 @@
                                 persons: ['谷'],
                                 periodStart: '2022-11-11',
                                 periodEnd: '2022-12-12',
-                                progress: 8,
                                 comments: [
                                     {
                                         date: '2022-11-11',
@@ -82,7 +80,6 @@
                                 persons: ['山'],
                                 periodStart: '2022-11-11',
                                 periodEnd: '2022-12-12',
-                                progress: 8,
                                 comments: [
                                     {
                                         date: '2022-11-11',
@@ -94,64 +91,66 @@
                                 ]
                             }
                         ],
+                        showEditPersons: false,
                         persons: [
                             {
                                 name: '山',
                                 txt_color: '#e66465',
                                 bg_color: '#f6b73c',
-                                isDisabled: true
+                                disabled: false
                             },
                             {
                                 name: '谷',
                                 txt_color: '#0000ff',
                                 bg_color: '#00ff00',
-                                isDisabled: true
+                                disabled: true
                             },
                             {
                                 name: '中',
                                 txt_color: '#ff00ff',
                                 bg_color: '#00ff00',
-                                isDisabled: true
+                                disabled: true
                             }
                         ],
                         status: [
                             {
                                 name: 'Active',
+                                txt_color: 'text-sky-900',
+                                bg_color: 'bg-sky-200'
+                            },
+                            {
+                                name: 'Inactive',
                                 txt_color: 'text-pink-900',
                                 bg_color: 'bg-pink-200'
                             },
                             {
-                                name: 'Inactive',
-                                txt_color: 'text-gray-900',
-                                bg_color: 'bg-gray-200'
-                            },
-                            {
                                 name: 'Completed',
-                                txt_color: 'text-emerald-900',
-                                bg_color: 'bg-emerald-200'
+                                txt_color: 'text-stone-900',
+                                bg_color: 'bg-stone-200'
                             }
                         ]
                     }
                 },
                 methods: {
-                    registTask() {
+                    addTask() {
                         this.tasks.unshift(
                             {
-                                name: this.inputTask.name,
-                                persons: [this.inputTask.person],
-                                progress: 0,
-                                comment: '',
-                                periodStart: this.inputTask.periodStart,
-                                periodEnd: this.inputTask.periodEnd
+                                name: '',
+                                persons: [],
+                                periodStart: dayjs(new Date()).format('YYYY/MM/DD'),
+                                periodEnd: dayjs(new Date()).format('YYYY/MM/DD'),
+                                comments: [
+                                    {
+                                        date: dayjs(new Date()).format('YYYY/MM/DD'),
+                                        progress: 0,
+                                        status: this.status[0].name,
+                                        person: '',
+                                        comment: ''
+                                    }
+                                ],
+                                inputTask: {}
                             }
                         );
-                        this.inputTask = {
-                            name: '',
-                            person: '',
-                            periodStart: '',
-                            periodEnd: ''
-                        };
-                        this.showRegistRow = false;
                     },
                     editTask(task, flagname) {
                         task.inputTask.name = task.name;
@@ -203,12 +202,20 @@
                 methods: {
                 }
             });
+            vueTasks.component('edit-persons', {
+                template: `#edit-persons`,
+                props: {
+                    persons: Object
+                },
+                methods: {
+                }
+            });
             vueTasks.mount('#tasks');
         });
 
     </script>
     <script type="text/x-template" id="selected-persons">
-        <aside @click="$emit('close')"
+    <aside @click="$emit('close')"
             class="block flex justify-center items-center
                 fixed top-0 left-0 w-screen h-screen bg-gray-400/70 duration-500 ease-out z-50">
         <div onclick="event.stopPropagation()"
@@ -238,17 +245,50 @@
                             </div>
                         </label>
                     </li>
-
                 </ul>
             </div>
         </div>
     </aside>
     </script>
+    <script type="text/x-template" id="edit-persons">
+        <aside @click="$emit('close')"
+            class="block flex justify-center items-center
+                fixed top-0 left-0 w-screen h-screen bg-gray-400/70 duration-500 ease-out z-50">
+            <div class="px-3 py-4 flex justify-center" >
+                <table class="w-full text-md bg-white shadow-md rounded mb-4" onclick="event.stopPropagation()">
+                    <tbody>
+                        <tr class="border-b">
+                            <th class="text-left p-3 px-5">Name</th>
+                            <th class="text-left p-3 px-5">Color</th>
+                            <th></th>
+                        </tr>
+                        <tr v-for="curPerson in persons" class="border-b hover:bg-orange-100 bg-gray-100">
+                            <td class="p-3 px-5">
+                                <div 
+                                    class="h-6 w-6 rounded-full bg-white text-sm flex justify-center items-center"
+                                    :style="{backgroundColor: curPerson.bg_color, color: curPerson.txt_color}">
+                                    {{ curPerson.name }}
+                                </div>
+                            </td>
+                            <td class="p-3 px-5"><input type="text" value="user.email" class="bg-transparent"></td>
+                            <td class="p-3 px-5 flex justify-end">
+                                <button
+                                    type="button"
+                                    class="text-sm bg-red-500 hover:bg-red-700 text-white py-1 px-2 rounded focus:outline-none focus:shadow-outline">
+                                    Active
+                                </button>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </aside>
+    </script>
 </head>
 
 <body class="antialiased font-sans bg-gray-200">
-    <main class="container mx-auto px-4 sm:px-8 py-8">
-        <h2 class="text-2xl font-semibold leading-tight">CC-Voice</h2>
+    <main class="container mx-auto px-4 sm:px-8 py-8" id="tasks">
+        <h2 class="text-2xl font-semibold leading-tight">{{ title }}</h2>
         <div class="my-2 flex sm:flex-row flex-col">
             <div class="flex flex-row mb-1 sm:mb-0">
                 <div class="relative">
@@ -277,8 +317,15 @@
                 <input placeholder="Search"
                     class="appearance-none rounded-r rounded-l sm:rounded-l-none border border-gray-400 border-b block pl-8 pr-6 py-2 w-full bg-white text-sm placeholder-gray-400 text-gray-700 focus:bg-white focus:placeholder-gray-600 focus:text-gray-700 focus:outline-none" />
             </div>
+            <div class="ml-auto">
+                <button @click="showEditPersons = true"
+                    class="mr-8 border-t-2 border-b-2 border-black hover:border-gray-300 hover:text-gray-600 px-1">
+                    <i class="fa-solid fa-user-plus"></i>
+                    <span class="ml-2">PERSON</span>
+                </button>
+            </div>
         </div>
-        <div class="inline-block min-w-full shadow rounded-lg overflow-hidden" id="tasks">
+        <div class="inline-block min-w-full shadow rounded-lg overflow-hidden">
 
             <table class="min-w-full leading-normal table-fixed">
                 <thead>
@@ -305,6 +352,7 @@
                         </th>
                         <th
                             class="px-5 py-3 border-b-2 border-gray-200 bg-gray-100 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
+                            <i class="cursor-pointer text-lg fa-solid fa-square-plus" @click="addTask()"></i>
                         </th>
                     </tr>
                 </thead>
@@ -341,7 +389,7 @@
                                     <div v-if="getObject(persons, curPerson)" :class="{'-ml-2': (index > 0)}"
                                         class="h-6 w-6 rounded-full bg-white text-sm flex justify-center items-center"
                                         :style="{backgroundColor: getObject(persons, curPerson).bg_color, color: getObject(persons, curPerson).txt_color}">
-                                            {{ getObject(persons, curPerson).name }}
+                                        {{ getObject(persons, curPerson).name }}
                                     </div>
                                 </span>
                             </div>
@@ -385,18 +433,19 @@
                         </td>
                         <!-- status ref-->
                         <td class="px-5 py-5 border-b border-gray-200 bg-white text-sm">
-                            <span class="relative inline-block px-3 py-1 font-semibold leading-tight"
-                                    :class="getObject(status,curTask.comments[0].status).txt_color">
+                            <span class="relative w-28 inline-block px-3 py-1 font-semibold leading-tight"
+                                :class="getObject(status,curTask.comments[0].status).txt_color">
                                 <span aria-hidden class="absolute inset-0 opacity-50 rounded-full"
-                                :class="getObject(status,curTask.comments[0].status).bg_color"></span>
+                                    :class="getObject(status,curTask.comments[0].status).bg_color"></span>
                                 <span class="relative">{{ curTask.comments[0].status }}</span>
                             </span>
                         </td>
+                        <!-- progress ref-->
                         <td class="px-5 py-5 border-b border-gray-200 bg-white text-sm">
-                            <div class="w-full bg-gray-200 rounded-full dark:bg-gray-700">
-                                <div class="bg-red-700 text-xs font-medium text-white text-center p-0.5 leading-none rounded-full"
-                                    :style="{ width: (curTask.comments?curTask.comments[0].progress:'0') + '%' }">
-                                    {{ curTask.comments?curTask.comments[0].progress:'0' }}%
+                            <div class="w-full bg-gray-100 rounded-full">
+                                <div class="bg-amber-200 text-xs font-medium text-amber-900 text-center p-0.5 leading-none rounded-full"
+                                    :style="{ width: (curTask.comments[0].progress) + '%' }">
+                                    {{ curTask.comments[0].progress }}%
                                 </div>
                             </div>
                         </td>
@@ -426,10 +475,9 @@
                     </button>
                 </div>
             </div>
-
-
-
         </div>
+
+        <edit-persons v-show="showEditPersons"  @close="showEditPersons = false" :persons="persons"/>
     </main>
 
     <footer class="flex justify-end fixed w-screen bottom-12">
@@ -444,6 +492,9 @@
             <span class="ml-2">LOAD</span>
         </button>
     </footer>
+
+
+
 
 
 </body>

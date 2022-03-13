@@ -173,7 +173,7 @@
                     },
                     deletedTask(index) {
                         const tarTasks = this.tasks;
-                        alertify.confirm(`Are you sure you want delete ${tarTasks[index].name} ?`,
+                        alertify.confirm('',`Are you sure you want delete ${tarTasks[index].name} ?`,
                             function () {
                                 tarTasks.splice(index, 1);
                                 alertify.success('Deleted');
@@ -208,8 +208,10 @@
                     persons: Object
                 },
                 methods: {
-                    changePersonColor(curPerson,color){
-                        curPerson.bg_color = 'bg-' + color + '-200';
+                    changePersonColor(tarPerson,tarColor){
+                        tarPerson.bg_color = 'bg-' + tarColor + '-200';
+                        tarPerson.txt_color = 'text-' + tarColor + '-900';
+                        console.log(tarPerson.bg_color )
                     }
                 }
             });
@@ -252,6 +254,7 @@
             </div>
         </div>
     </aside>
+    <!-- edit persons component -->
     </script>
     <script type="text/x-template" id="edit-persons">
         <aside @click="$emit('close')"
@@ -261,11 +264,11 @@
                 <table class="w-full text-md bg-white shadow-md rounded mb-4" onclick="event.stopPropagation()">
                     <tbody>
                         <tr class="border-b">
-                            <th class="text-left p-3 px-5">Name</th>
+                            <th class="text-left p-3 px-5">Icon</th>
                             <th class="text-left p-3 px-5">Color</th>
-                            <th></th>
+                            <th><i class="cursor-pointer text-lg fa-solid fa-user-plus"></i></th>
                         </tr>
-                        <tr v-for="curPerson in persons" class="border-b hover:bg-orange-100 bg-gray-100">
+                        <tr v-for="curPerson in persons" class="border-b hover:bg-red-100 bg-gray-100">
                             <td class="p-3 px-5">
                                 <div 
                                     class="h-6 w-6 rounded-full bg-white text-sm flex justify-center items-center"
@@ -273,12 +276,13 @@
                                     {{ curPerson.name }}
                                 </div>
                             </td>
+
                             <td class="p-3 px-5">
-                                <select class="bg-transparent">
+                                <select class="bg-transparent" @input="changePersonColor(curPerson,$event.target.value)" :value="curPerson.bg_color.replace('bg-','').replace('-200','')">
                                     <option v-for="curColor in ['slate','gray','zinc','neutral','stone','red','orange','amber','yellow'
                                         ,'lime','green','emerald','teal','cyan','sky','blue','indigo','violet','purple','fuchsia','pink','rose'] " 
                                         :class="'bg-' + curColor + '-200'"
-                                        @input="changePersonColor(curPerson,curColor)">
+                                        :value="curColor">
                                         {{ curColor }}
                                     </option>
                                 </select>

@@ -95,20 +95,20 @@
                         persons: [
                             {
                                 name: '山',
-                                txt_color: '#e66465',
-                                bg_color: '#f6b73c',
+                                txt_color: 'text-sky-900',
+                                bg_color: 'bg-sky-200',
                                 disabled: false
                             },
                             {
                                 name: '谷',
-                                txt_color: '#0000ff',
-                                bg_color: '#00ff00',
+                                txt_color: 'text-pink-900',
+                                bg_color: 'bg-pink-200',
                                 disabled: true
                             },
                             {
                                 name: '中',
-                                txt_color: '#ff00ff',
-                                bg_color: '#00ff00',
+                                txt_color: 'text-stone-900',
+                                bg_color: 'bg-stone-200',
                                 disabled: true
                             }
                         ],
@@ -208,6 +208,9 @@
                     persons: Object
                 },
                 methods: {
+                    changePersonColor(curPerson,color){
+                        curPerson.bg_color = 'bg-' + color + '-200';
+                    }
                 }
             });
             vueTasks.mount('#tasks');
@@ -233,8 +236,8 @@
                         <label class="block flex items-center space-x-4">
                             <div class="flex-shrink-0">
                                 <div class="h-8 w-8 rounded-full bg-white flex justify-center items-center"
-                                    :style="{backgroundColor: curPerson.bg_color}">
-                                    <span class="text-xl" :style="{color: curPerson.txt_color}">
+                                    :class="curPerson.bg_color">
+                                    <span class="text-xl" :class="curPerson.txt_color">
                                         {{ curPerson.name }}
                                     </span>
                                 </div>
@@ -266,11 +269,20 @@
                             <td class="p-3 px-5">
                                 <div 
                                     class="h-6 w-6 rounded-full bg-white text-sm flex justify-center items-center"
-                                    :style="{backgroundColor: curPerson.bg_color, color: curPerson.txt_color}">
+                                    :class="[curPerson.bg_color, curPerson.txt_color]">
                                     {{ curPerson.name }}
                                 </div>
                             </td>
-                            <td class="p-3 px-5"><input type="text" value="user.email" class="bg-transparent"></td>
+                            <td class="p-3 px-5">
+                                <select class="bg-transparent">
+                                    <option v-for="curColor in ['slate','gray','zinc','neutral','stone','red','orange','amber','yellow'
+                                        ,'lime','green','emerald','teal','cyan','sky','blue','indigo','violet','purple','fuchsia','pink','rose'] " 
+                                        :class="'bg-' + curColor + '-200'"
+                                        @input="changePersonColor(curPerson,curColor)">
+                                        {{ curColor }}
+                                    </option>
+                                </select>
+                            </td>
                             <td class="p-3 px-5 flex justify-end">
                                 <button
                                     type="button"
@@ -386,9 +398,9 @@
                             class="px-5 border-b border-gray-200 bg-white text-sm group relative">
                             <div class="flex items-center">
                                 <span v-for="(curPerson,index) in curTask.persons">
-                                    <div v-if="getObject(persons, curPerson)" :class="{'-ml-2': (index > 0)}"
+                                    <div v-if="getObject(persons, curPerson)"
                                         class="h-6 w-6 rounded-full bg-white text-sm flex justify-center items-center"
-                                        :style="{backgroundColor: getObject(persons, curPerson).bg_color, color: getObject(persons, curPerson).txt_color}">
+                                        :class="[{'-ml-2': (index > 0)},getObject(persons, curPerson).bg_color,getObject(persons, curPerson).txt_color]">
                                         {{ getObject(persons, curPerson).name }}
                                     </div>
                                 </span>

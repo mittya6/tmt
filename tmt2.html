@@ -283,7 +283,7 @@
     </script>
     <!-- select person component start-->
     <script type="text/x-template" id="selected-persons">
-    <aside @click="$emit('close')"
+        <aside @click="$emit('close')"
             class="block flex justify-center items-center
                 fixed top-0 left-0 w-screen h-screen bg-gray-400/70 duration-500 ease-out z-50">
         <div onclick="event.stopPropagation()"
@@ -595,9 +595,14 @@
                         </td>
                         <!-- persons edit -->
                         <td v-show="curTask.inputTask.isEditTaskPersons">
-                            <selected-persons v-show="curTask.inputTask.isEditTaskPersons" :persons="persons"
-                                :curtask="curTask" @close="cancelEditTask(curTask, 'isEditTaskPersons')"
-                                @editedtask="editedTask($event,'isEditTaskPersons')" />
+                            <transition enter-active-class="duration-400 ease-out "
+                                enter-from-class="transform opacity-0" enter-to-class="opacity-100"
+                                leave-active-class="duration-1000 ease-in" leave-from-class="opacity-100"
+                                leave-to-class="transform opacity-0">
+                                <selected-persons v-show="curTask.inputTask.isEditTaskPersons" :persons="persons"
+                                    :curtask="curTask" @close="cancelEditTask(curTask, 'isEditTaskPersons')"
+                                    @editedtask="editedTask($event,'isEditTaskPersons')" />
+                            </transition>
                         </td>
                         <!-- period ref-->
                         <td v-show="!curTask.inputTask.isEditPeriod"

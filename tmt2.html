@@ -2,6 +2,8 @@
 <html>
 
 <head>
+    <meta charset="utf-8">
+
     <script src="https://cdn.tailwindcss.com"></script>
 
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css"
@@ -19,13 +21,17 @@
         integrity="sha512-IXuoq1aFd2wXs4NqGskwX2Vb+I8UJ+tGJEu/Dc0zwLNKeQ7CW3Sr6v0yU3z5OQWe3eScVIkER4J9L7byrgR/fA=="
         crossorigin="anonymous" referrerpolicy="no-referrer" />
 
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/FileSaver.js/1.3.3/FileSaver.min.js"></script>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/lodash.js/4.17.21/lodash.min.js" integrity="sha512-WFN04846sdKMIP5LKNphMaWzU7YpMyCU245etK3g/2ARYbPK9Ub18eG+ljU96qKRCWh+quCY7yefSmlkQw1ANQ==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+
     <script src="https://unpkg.com/vue@next"></script>
 
-    <!-- modal Select Persons -->
     <script>
+        let vueTasks;
         window.addEventListener('DOMContentLoaded', (event) => {
 
-            const vueTasks = Vue.createApp({
+            vueTasks = Vue.createApp({
                 data() {
                     return {
                         title: 'CC-Voice',
@@ -257,7 +263,7 @@
                             progress: 0,
                             status: '',
                             person: '',
-                            comment: ''
+                            comment: '',
                         }
                     }
                 },
@@ -267,6 +273,16 @@
                     },
                     format(curDate) {
                         return dayjs(curDate).format('YYYY/MM/DD')
+                    },
+                    registComment(){
+                        this.curtask.comments.push({
+                            date: this.inputComment.date,
+                            progress: this.inputComment.progress,
+                            status: this.inputComment.status,
+                            person: this.inputComment.person,
+                            comment: this.inputComment.comment,
+                        });
+                        this.inputComment.comment = '';
                     }
                 },
                 mounted() {
@@ -277,8 +293,14 @@
                 }
             });
 
-            vueTasks.mount('#tasks');
+            vueTasks = vueTasks.mount('#tasks');
         });
+        function save(){
+            let taskData = _.cloneDeep(vueTasks.$data);
+
+            let blob = new Blob([JSON.stringify(taskData, null, 2)], { type: "text/json;charset=utf-8" });
+            saveAs(blob, 'gantt.json');
+        }
 
     </script>
     <!-- select person component start-->
@@ -292,7 +314,7 @@
                 <h3 class="text-xl font-bold leading-none text-gray-900 dark:text-white">
                     Select Persons
                 </h3>
-                <i class="cursor-pointer fa-solid fa-rectangle-xmark" @click="$emit('close')"></i>
+                <i class="cursor-pointer ml-4 fa-solid fa-rectangle-xmark" @click="$emit('close')"></i>
                 <i class="cursor-pointer ml-2 fa-solid fa-floppy-disk" @click="$emit('editedtask',curtask)"></i>
             </div>
             <div class="flow-root">
@@ -462,8 +484,8 @@
                     </div>
                 </div>
                 <div class="ml-4">
-                    <button @click="curtask.comments.push(inputComment)"
-                        class="flex items-center justify-center bg-indigo-200 hover:bg-indigo-600 rounded-xl text-white px-4 py-1 flex-shrink-0">
+                    <button @click="registComment()"
+                        class="flex items-center justify-center bg-indigo-400 hover:bg-indigo-600 rounded-xl text-white px-4 py-1 flex-shrink-0">
                         <span>Send</span>
                         <span class="ml-2">
                             <svg class="w-4 h-4 transform rotate-45 -mt-px" fill="none" stroke="currentColor"
@@ -577,8 +599,7 @@
                             </div>
                         </td>
                         <!-- persons ref -->
-                        <td v-show="!curTask.inputTask.isEditTaskPersons"
-                            class="px-5 border-b border-gray-200 bg-white text-sm group relative">
+                        <td class="px-5 border-b border-gray-200 bg-white text-sm group relative">
                             <div class="flex items-center">
                                 <span v-for="(curPerson,index) in curTask.persons">
                                     <div v-if="getObject(persons, curPerson)"
@@ -592,12 +613,10 @@
                             <i @click="editTask(curTask, 'isEditTaskPersons')" class="cursor-pointer text-gray-900 absolute top-2 right-4
                                         group-hover:visible invisible
                                         fa-solid fa-pen-to-square"></i>
-                        </td>
-                        <!-- persons edit -->
-                        <td v-show="curTask.inputTask.isEditTaskPersons">
-                            <transition enter-active-class="duration-400 ease-out "
+
+                            <transition enter-active-class="duration-200 ease-out "
                                 enter-from-class="transform opacity-0" enter-to-class="opacity-100"
-                                leave-active-class="duration-1000 ease-in" leave-from-class="opacity-100"
+                                leave-active-class="duration-200 ease-in" leave-from-class="opacity-100"
                                 leave-to-class="transform opacity-0">
                                 <selected-persons v-show="curTask.inputTask.isEditTaskPersons" :persons="persons"
                                     :curtask="curTask" @close="cancelEditTask(curTask, 'isEditTaskPersons')"
@@ -657,9 +676,14 @@
                                 <i @click="deletedTask(index)" class="ml-4 cursor-pointer fa-solid fa-trash-can"></i>
                             </div>
 
-                            <comment-list v-show="curTask.comments.showComments" :persons="persons" :curtask="curTask"
-                                :status="status" @close="curTask.comments.showComments = false" />
-
+                            <transition enter-active-class="duration-600 ease-out "
+                                enter-from-class="transform opacity-0 skew-x-3" enter-to-class="opacity-100 skew-x-0"
+                                leave-active-class="duration-200 ease-in" leave-from-class="opacity-100"
+                                leave-to-class="transform opacity-0">
+                                <comment-list v-show="curTask.comments.showComments" :persons="persons"
+                                    :curtask="curTask" :status="status"
+                                    @close="curTask.comments.showComments = false" />
+                            </transition>
                         </td>
                     </tr>
                 </tbody>
@@ -671,10 +695,11 @@
         </div>
 
         <edit-persons v-show="showEditPersons" @close="showEditPersons = false" :persons="persons" />
+
     </main>
 
     <footer class="flex justify-end fixed w-screen bottom-12">
-        <button onclick=""
+        <button onclick="save()"
             class="mr-8 border-t-2 border-b-2 border-black hover:border-gray-300 hover:text-gray-600 px-1">
             <i class="fa-solid fa-download"></i>
             <span class="ml-2">SAVE</span>
@@ -685,8 +710,6 @@
             <span class="ml-2">LOAD</span>
         </button>
     </footer>
-
-
 
 </body>
 

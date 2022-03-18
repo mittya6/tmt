@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <script src="https://unpkg.com/vue@next"></script>
+    <script src="https://cdn.tailwindcss.com"></script>
+
+    <script>
+        window.addEventListener('DOMContentLoaded', (event) => {
+
+            const Demo = {
+                data() {
+                    return {
+                        items: [1, 2, 3, 4, 5, 6, 7, 8, 9],
+                        nextNum: 10
+                    }
+                },
+                methods: {
+                    randomIndex() {
+                        return Math.floor(Math.random() * this.items.length)
+                    },
+                    add() {
+                        this.items.push(this.randomIndex())
+                    },
+                    remove() {
+                        this.items.splice(this.randomIndex(), 1)
+                    }
+                }
+            }
+
+            Vue.createApp(Demo).mount('#list-demo')
+
+        });
+    </script>
+    <style>
+        .list-item {
+            margin-right: 10px;
+        }
+
+        .list-enter-active,
+        .list-leave-active {
+            transition: all 1s ease;
+        }
+
+        .list-enter-from,
+        .list-leave-to {
+            opacity: 0;
+            transform: translateY(30px);
+        }
+    </style>>
+</head>
+
+<body>
+    <div id="app" class="m-8">
+        <div id="list-demo">
+            <button @click="add">Add</button>
+            <button @click="remove">Remove</button>
+            <table>
+                <tbody is="vue:transition-group" enter-active-class="duration-1000 ease-out "
+                enter-from-class="transform opacity-0 scale-0" enter-to-class="opacity-100 scale-100"
+                leave-active-class="duration-1000 ease-in" leave-from-class="opacity-100"
+                leave-to-class="transform opacity-0">
+                    <tr v-for="item in items" :key="item">
+                        <td>
+                            {{ item }}
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</body>
+
+</html>

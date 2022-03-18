@@ -544,7 +544,8 @@
             </div>
             <div class="ml-auto">
                 <!-- person edit button -->
-                <div @click="showEditPersons = true" class="cursor-pointer w-10 h-10 rounded-full border border-stone-400 text-stone-400 hover:text-stone-900 flex items-center justify-center">
+                <div @click="showEditPersons = true"
+                    class="cursor-pointer w-10 h-10 rounded-full border border-stone-400 text-stone-400 hover:text-stone-900 flex items-center justify-center">
                     <i class="fa-solid fa-user-plus"></i>
                 </div>
             </div>
@@ -577,12 +578,16 @@
                         <th
                             class="px-5 py-3 border-b-2 border-gray-200 bg-gray-100 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
                             <!-- add task button -->
-                            <i class="cursor-pointer text-lg fa-solid fa-square-plus text-stone-400 hover:text-stone-900" @click="addTask()"></i>
+                            <i class="cursor-pointer text-lg fa-solid fa-square-plus text-stone-400 hover:text-stone-900"
+                                @click="addTask()"></i>
                         </th>
                     </tr>
                 </thead>
-                <tbody v-for="(curTask, index) in tasks">
-                    <tr>
+                <tbody is="vue:transition-group" enter-active-class="duration-500 ease-out "
+                    enter-from-class="transform opacity-0 bg-orange-100	scale-y-0" enter-to-class="opacity-100 bg-white scale-y-100"
+                    leave-active-class="duration-500 ease-in overflow-hidden" leave-from-class="opacity-100 scale-y-100"
+                    leave-to-class="transform opacity-0 scale-y-0">
+                    <tr v-for="(curTask, index) in tasks" :key="curTask">
                         <!-- taskaname ref-->
                         <td v-show="!curTask.inputTask.isEditTaskname"
                             class="px-5 border-b border-gray-200 bg-white text-sm group relative">
@@ -692,9 +697,9 @@
                             </div>
 
                             <transition enter-active-class="duration-300 ease-out "
-                                enter-from-class="transform opacity-0 skew-x-2" enter-to-class="opacity-100 skew-x-0"
+                                enter-from-class="transform opacity-0 skew-x-3" enter-to-class="opacity-100 skew-x-0"
                                 leave-active-class="duration-200 ease-in" leave-from-class="opacity-100 skew-x-0"
-                                leave-to-class="transform opacity-0 skew-x-2">
+                                leave-to-class="transform opacity-0 skew-x-3">
                                 <comment-list v-show="curTask.comments.showComments" :persons="persons"
                                     :curtask="curTask" :status="status"
                                     @close="curTask.comments.showComments = false" />
@@ -707,10 +712,9 @@
                 class="px-5 py-5 bg-white border-t flex flex-col xs:flex-row items-center xs:justify-between          ">
             </div>
         </div>
-        <transition enter-active-class="duration-300 ease-out "
-            enter-from-class="transform opacity-0 -translate-y-2" enter-to-class="opacity-100 translate-y-0"
-            leave-active-class="duration-200 ease-in" leave-from-class="opacity-100"
-            leave-to-class="transform opacity-0">
+        <transition enter-active-class="duration-300 ease-out " enter-from-class="transform opacity-0 -translate-y-2"
+            enter-to-class="opacity-100 translate-y-0" leave-active-class="duration-200 ease-in"
+            leave-from-class="opacity-100" leave-to-class="transform opacity-0">
             <edit-persons v-show="showEditPersons" @close="showEditPersons = false" :persons="persons" />
         </transition>
     </main>

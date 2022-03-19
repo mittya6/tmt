@@ -41,8 +41,6 @@
                             {
                                 name: 'LUAライセンス対応1',
                                 persons: ['中', '山'],
-                                periodStart: '2022-11-11',
-                                periodEnd: '2022-12-12',
                                 comments: [
                                     {
                                         date: '2022-11-11',
@@ -70,8 +68,6 @@
                             {
                                 name: 'LUAライセンス対応2',
                                 persons: ['中', '山'],
-                                periodStart: '2022-11-11',
-                                periodEnd: '2022-12-12',
                                 comments: [
                                     {
                                         date: '2022-11-11',
@@ -85,8 +81,6 @@
                             {
                                 name: 'LUAライセンス対応3',
                                 persons: ['谷'],
-                                periodStart: '2022-11-11',
-                                periodEnd: '2022-12-12',
                                 comments: [
                                     {
                                         date: '2022-11-11',
@@ -100,8 +94,6 @@
                             {
                                 name: 'LUAライセンス対応4',
                                 persons: ['山'],
-                                periodStart: '2022-11-11',
-                                periodEnd: '2022-12-12',
                                 comments: [
                                     {
                                         date: '2022-11-11',
@@ -301,9 +293,13 @@
         });
         function save() {
             let taskData = _.cloneDeep(vueTasks.$data);
+            //delete unnecessary property
+            taskData.tasks.forEach((curTask) => {
+                delete curTask.inputTask;
+            })
 
             let blob = new Blob([JSON.stringify(taskData, null, 2)], { type: "text/json;charset=utf-8" });
-            saveAs(blob, 'gantt.json');
+            saveAs(blob, 'tmt.json');
         }
 
     </script>
@@ -515,24 +511,22 @@
 <body class="antialiased font-sans bg-gray-200">
     <main class="container mx-auto px-4 sm:px-8 py-8" id="tasks" v-cloak>
         <h2 class="text-2xl font-semibold leading-tight">{{ title }}</h2>
-        <div class="my-2 flex sm:flex-row flex-col">
+        <div class="my-2 flex flex-row items-stretch">
             <div class="flex flex-row mb-1 sm:mb-0">
-                <div class="relative">
+                <div>
                     <select
-                        class="appearance-none h-full rounded-l border-t sm:rounded-r-none sm:border-r-0 border-r border-b block appearance-none w-full bg-white border-gray-400 text-gray-700 py-2 px-4 pr-8 leading-tight focus:outline-none focus:border-l focus:border-r focus:bg-white focus:border-gray-500">
-                        <option>All</option>
-                        <option>Active</option>
-                        <option>Inactive</option>
+                        class=" h-full block
+                        rounded-l border-t  rounded-r-none border-r-0
+                        bg-white overflow-hidden
+                        border-gray-400 text-gray-700 
+                        py-2 px-4 pr-8 leading-tight 
+                        focus:outline-none focus:border-l focus:border-r focus:bg-white focus:border-gray-500">
+                        <option v-for="curStatus in status">{{ curStatus.name }}</option>
                     </select>
-                    <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-gray-700">
-                        <svg class="fill-current h-4 w-4" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20">
-                            <path d="M9.293 12.95l.707.707L15.657 8l-1.414-1.414L10 10.828 5.757 6.586 4.343 8z" />
-                        </svg>
-                    </div>
                 </div>
             </div>
-            <div class="block relative">
-                <span class="h-full absolute inset-y-0 left-0 flex items-center pl-2">
+            <div class="relative ">
+                <span class="absolute inset-y-0 left-0 flex items-center pl-2">
                     <svg viewBox="0 0 24 24" class="h-4 w-4 fill-current text-gray-500">
                         <path
                             d="M10 4a6 6 0 100 12 6 6 0 000-12zm-8 6a8 8 0 1114.32 4.906l5.387 5.387a1 1 0 01-1.414 1.414l-5.387-5.387A8 8 0 012 10z">
@@ -540,7 +534,12 @@
                     </svg>
                 </span>
                 <input placeholder="Search"
-                    class="appearance-none rounded-r rounded-l sm:rounded-l-none border border-gray-400 border-b block pl-8 pr-6 py-2 w-full bg-white text-sm placeholder-gray-400 text-gray-700 focus:bg-white focus:placeholder-gray-600 focus:text-gray-700 focus:outline-none" />
+                    class="appearance-none block w-full h-full
+                        rounded-l-none 
+                        border border-gray-400 border-b 
+                        pl-8 pr-6 py-2 
+                        bg-white text-sm placeholder-gray-400 text-gray-700 
+                        focus:bg-white focus:placeholder-gray-600 focus:text-gray-700 focus:outline-none" />
             </div>
             <div class="ml-auto">
                 <!-- person edit button -->
@@ -551,7 +550,6 @@
             </div>
         </div>
         <div class="inline-block min-w-full shadow rounded-lg overflow-hidden">
-
             <table class="min-w-full leading-normal table-fixed">
                 <thead>
                     <tr>
@@ -589,7 +587,7 @@
                     leave-to-class="transform opacity-0 scale-y-0">
                     <tr v-for="(curTask, index) in tasks" :key="curTask">
                         <!-- taskaname ref-->
-                        <td v-show="!curTask.inputTask.isEditTaskname"
+                        <td v-show="!curTask.inputTask.isEditTaskname" :title="curTask.name"
                             class="px-5 border-b border-gray-200 bg-white text-sm group relative">
                             <p class="text-gray-900 whitespace-no-wrap">
                                 {{ curTask.name }}

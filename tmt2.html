@@ -288,19 +288,41 @@
                     this.inputComment.person = this.curtask.comments[this.curtask.comments.length - 1].person;
                 }
             });
-
             vueTasks = vueTasks.mount('#tasks');
+
+            const tarBody = document.querySelector('body');
+            tarBody.addEventListener("drop", (event) => {
+                event.preventDefault();
+                let reader = new FileReader();
+                reader.onload = function (event) {
+                    // ファイルのテキストがここにプリントされる
+                    savedData = JSON.parse(event.target.result);
+                    savedData.tasks.forEach(curTask => curTask.inputTask = {});
+                    document.title = savedData.title;
+                    vueTasks.$data.tasks = savedData.tasks;
+                };
+                reader.readAsText(event.dataTransfer.files[0]);
+            });
+            tarBody.addEventListener("dragover", (event) => {
+                event.preventDefault();
+            });
         });
+
+
+
         function save() {
             let taskData = _.cloneDeep(vueTasks.$data);
             //delete unnecessary property
             taskData.tasks.forEach((curTask) => {
                 delete curTask.inputTask;
             })
+            delete tasks.showEditPersons;
 
             let blob = new Blob([JSON.stringify(taskData, null, 2)], { type: "text/json;charset=utf-8" });
             saveAs(blob, 'tmt.json');
         }
+
+
 
     </script>
     <!-- select person component start-->
@@ -514,8 +536,7 @@
         <div class="my-2 flex flex-row items-stretch">
             <div class="flex flex-row mb-1 sm:mb-0">
                 <div>
-                    <select
-                        class=" h-full block
+                    <select class=" h-full block
                         rounded-l border-t  rounded-r-none border-r-0
                         bg-white overflow-hidden
                         border-gray-400 text-gray-700 
@@ -533,8 +554,7 @@
                         </path>
                     </svg>
                 </span>
-                <input placeholder="Search"
-                    class="appearance-none block w-full h-full
+                <input placeholder="Search" class="appearance-none block w-full h-full
                         rounded-l-none 
                         border border-gray-400 border-b 
                         pl-8 pr-6 py-2 
@@ -581,8 +601,9 @@
                         </th>
                     </tr>
                 </thead>
-                <tbody is="vue:transition-group" enter-active-class="duration-500 ease-out "
-                    enter-from-class="transform opacity-0 bg-orange-100	scale-y-0" enter-to-class="opacity-100 bg-white scale-y-100"
+                <tbody is="vue:transition-group" enter-active-class="duration-500 ease-out"
+                    enter-from-class="transform opacity-0 bg-orange-100	scale-y-0"
+                    enter-to-class="opacity-100 bg-white scale-y-100"
                     leave-active-class="duration-500 ease-in overflow-hidden" leave-from-class="opacity-100 scale-y-100"
                     leave-to-class="transform opacity-0 scale-y-0">
                     <tr v-for="(curTask, index) in tasks" :key="curTask">

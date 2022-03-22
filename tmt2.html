@@ -297,8 +297,11 @@
                 reader.onload = function (event) {
                     // ファイルのテキストがここにプリントされる
                     savedData = JSON.parse(event.target.result);
-                    savedData.tasks.forEach(curTask => curTask.inputTask = {});
+                    
                     document.title = savedData.title;
+                    vueTasks.$data.status = savedData.status;
+                    vueTasks.$data.persons = savedData.persons;
+                    savedData.tasks.forEach(curTask => curTask.inputTask = {});
                     vueTasks.$data.tasks = savedData.tasks;
                 };
                 reader.readAsText(event.dataTransfer.files[0]);

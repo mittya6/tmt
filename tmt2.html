@@ -37,112 +37,10 @@
                 data() {
                     return {
                         title: 'CC-Voice',
-                        tasks: [
-                            {
-                                name: 'LUAライセンス対応1',
-                                persons: ['中', '山'],
-                                comments: [
-                                    {
-                                        date: '2022-11-11',
-                                        progress: 10,
-                                        status: 'Active',
-                                        person: '中',
-                                        comment: 'Lorem ipsum dolor sit amet, consectetur adipisicing elit. Vel ipsa commodi illum saepe numquam maxime asperiores voluptate sit, minima perspiciatis.'
-                                    },
-                                    {
-                                        date: '2022-11-12',
-                                        progress: 10,
-                                        status: 'Inactive',
-                                        person: '谷',
-                                        comment: 'Hey How are you today?'
-                                    },
-                                    {
-                                        date: '2022-11-14',
-                                        progress: 30,
-                                        status: 'Inactive',
-                                        person: '山',
-                                        comment: '現在対応中'
-                                    },
-                                ]
-                            },
-                            {
-                                name: 'LUAライセンス対応2',
-                                persons: ['中', '山'],
-                                comments: [
-                                    {
-                                        date: '2022-11-11',
-                                        progress: 52,
-                                        status: 'Inactive',
-                                        person: '中',
-                                        comment: '現在対応中'
-                                    }
-                                ]
-                            },
-                            {
-                                name: 'LUAライセンス対応3',
-                                persons: ['谷'],
-                                comments: [
-                                    {
-                                        date: '2022-11-11',
-                                        progress: 30,
-                                        status: 'Active',
-                                        person: '中',
-                                        comment: '現在対応中'
-                                    }
-                                ]
-                            },
-                            {
-                                name: 'LUAライセンス対応4',
-                                persons: ['山'],
-                                comments: [
-                                    {
-                                        date: '2022-11-11',
-                                        progress: 80,
-                                        status: 'Completed',
-                                        person: '中',
-                                        comment: '現在対応中'
-                                    }
-                                ]
-                            }
-                        ],
+                        tasks: [],
                         showEditPersons: false,
-                        persons: [
-                            {
-                                name: '山',
-                                txt_color: 'text-sky-900',
-                                bg_color: 'bg-sky-200',
-                                disabled: false
-                            },
-                            {
-                                name: '谷',
-                                txt_color: 'text-pink-900',
-                                bg_color: 'bg-pink-200',
-                                disabled: true
-                            },
-                            {
-                                name: '中',
-                                txt_color: 'text-stone-900',
-                                bg_color: 'bg-stone-200',
-                                disabled: true
-                            }
-                        ],
-                        status: [
-                            {
-                                name: 'Active',
-                                txt_color: 'text-sky-900',
-                                bg_color: 'bg-sky-200'
-                            },
-                            {
-                                name: 'Inactive',
-                                txt_color: 'text-pink-900',
-                                bg_color: 'bg-pink-200'
-                            },
-                            {
-                                name: 'Completed',
-                                txt_color: 'text-stone-900',
-                                bg_color: 'bg-stone-200'
-                            }
-                        ]
+                        persons: [],
+                        status: []
                     }
                 },
                 methods: {
@@ -577,7 +475,7 @@
                 <thead>
                     <tr>
                         <th
-                            class="px-5 border-b-2 border-gray-200 bg-gray-100 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider w-64">
+                            class="px-5 border-b-2 border-gray-200 bg-gray-100 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider w-80">
                             Task
                         </th>
                         <th

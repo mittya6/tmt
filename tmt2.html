@@ -40,7 +40,23 @@
                         tasks: [],
                         showEditPersons: false,
                         persons: [],
-                        status: []
+                        status: [
+                            {
+                                name: 'Active',
+                                txt_color: 'text-sky-900',
+                                bg_color: 'bg-sky-200'
+                            },
+                            {
+                                name: 'Inactive',
+                                txt_color: 'text-pink-900',
+                                bg_color: 'bg-pink-200'
+                            },
+                            {
+                                name: 'Completed',
+                                txt_color: 'text-stone-900',
+                                bg_color: 'bg-stone-200'
+                            }
+                        ]
                     }
                 },
                 methods: {
@@ -193,7 +209,6 @@
                 event.preventDefault();
                 let reader = new FileReader();
                 reader.onload = function (event) {
-                    // ファイルのテキストがここにプリントされる
                     savedData = JSON.parse(event.target.result);
                     
                     document.title = savedData.title;
@@ -222,9 +237,6 @@
             let blob = new Blob([JSON.stringify(taskData, null, 2)], { type: "text/json;charset=utf-8" });
             saveAs(blob, 'tmt.json');
         }
-
-
-
     </script>
     <!-- select person component start-->
     <script type="text/x-template" id="selected-persons">
@@ -275,7 +287,7 @@
                         <tr class="border-b">
                             <th class="text-left p-3 px-5">Icon</th>
                             <th class="text-left p-3 px-5">Color</th>
-                            <th><i class="cursor-pointer text-lg fa-solid fa-user-plus  text-stone-400 hover:text-stone-900" @click="inputPerson(persons)"></i></th>
+                            <th><i class="mx-8 cursor-pointer text-lg fa-solid fa-user-plus  text-stone-400 hover:text-stone-900" @click="inputPerson(persons)"></i></th>
                         </tr>
                         <tr v-for="curPerson in persons" class="border-b hover:bg-red-100 bg-gray-100">
                             <td class="p-3 px-5">

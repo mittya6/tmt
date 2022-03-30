@@ -238,6 +238,7 @@
             saveAs(blob, 'tmt.json');
         }
     </script>
+
     <!-- select person component start-->
     <script type="text/x-template" id="selected-persons">
         <aside @click="$emit('close')"
@@ -276,6 +277,7 @@
     </aside>
     </script>
     <!-- select person component end-->
+
     <!-- edit persons component start -->
     <script type="text/x-template" id="edit-persons">
         <aside @click="$emit('close')"
@@ -322,6 +324,7 @@
         </aside>
     </script>
     <!-- edit persons component end -->
+
     <!-- comments list component start -->
     <script type="text/x-template" id="comment-list">
     <aside @click="$emit('close')"
@@ -358,7 +361,7 @@
                                             <span class="relative">{{ curComment.status }}</span>
                                         </span>
                                     </div>
-                                    <div class="py-2">{{ curComment.comment }}</div>
+                                    <div class="py-2" v-html="curComment.comment.replace(/\n/g,'<br>')"></div>
                                 </div>
                             </div>
                             <div v-else class="flex items-center justify-start flex-row-reverse py-8" onclick="event.stopPropagation()">
@@ -385,7 +388,7 @@
                                             <span class="relative">{{ curComment.status }}</span>
                                         </span>
                                     </div>
-                                    <div class="py-2">{{ curComment.comment }}</div>
+                                    <div class="py-2"  v-html="curComment.comment.replace(/\n/g,'<br>')"></div>
                                 </div>
                             </div>
                         </div>

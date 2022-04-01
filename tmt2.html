@@ -352,7 +352,6 @@
     </script>
     <!-- select priority component end-->
 
-
     <!-- edit persons component start -->
     <script type="text/x-template" id="edit-persons">
         <aside @click="$emit('close')"
@@ -399,6 +398,7 @@
         </aside>
     </script>
     <!-- edit persons component end -->
+
     <!-- comments list component start -->
     <script type="text/x-template" id="comment-list">
     <aside @click="$emit('close')"
@@ -435,7 +435,7 @@
                                             <span class="relative">{{ curComment.status }}</span>
                                         </span>
                                     </div>
-                                    <div class="py-2">{{ curComment.comment }}</div>
+                                    <div class="py-2" v-html="curComment.comment.replace(/\n/g,'<br>')"></div>
                                 </div>
                             </div>
                             <div v-else class="flex items-center justify-start flex-row-reverse py-8" onclick="event.stopPropagation()">
@@ -462,7 +462,7 @@
                                             <span class="relative">{{ curComment.status }}</span>
                                         </span>
                                     </div>
-                                    <div class="py-2">{{ curComment.comment }}</div>
+                                    <div class="py-2"  v-html="curComment.comment.replace(/\n/g,'<br>')"></div>
                                 </div>
                             </div>
                         </div>
@@ -570,7 +570,7 @@
                         <th
                             class="px-5 border-b-2 border-gray-200 bg-gray-100 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider group relative">
                             Priority
-                            <i class="cursor-pointer absolute top-2 right-8
+                            <i class="cursor-pointer absolute top-2 right-10
                             group-hover:visible invisible
                             fa-solid fa-sort-up text-stone-400 hover:text-stone-900"></i>
                             <i class="cursor-pointer absolute top-2 right-4

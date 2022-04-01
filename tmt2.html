@@ -56,6 +56,33 @@
                                 txt_color: 'text-stone-900',
                                 bg_color: 'bg-stone-200'
                             }
+                        ],
+                        priority: [
+                            {
+                                name: 'VH',
+                                txt_color: 'text-red-900',
+                                bg_color: 'bg-red-200'
+                            },
+                            {
+                                name: 'H',
+                                txt_color: 'text-pink-900',
+                                bg_color: 'bg-pink-200'
+                            },
+                            {
+                                name: 'N',
+                                txt_color: 'text-stone-900',
+                                bg_color: 'bg-stone-200'
+                            },
+                            {
+                                name: 'L',
+                                txt_color: 'text-stone-900',
+                                bg_color: 'bg-stone-200'
+                            },
+                            {
+                                name: 'VL',
+                                txt_color: 'text-stone-900',
+                                bg_color: 'bg-stone-200'
+                            }
                         ]
                     }
                 },
@@ -83,6 +110,7 @@
                     editTask(task, flagname) {
                         task.inputTask.name = task.name;
                         task.inputTask.persons = task.persons;
+                        task.inputTask.priority = task.priority;
                         task.inputTask.periodStart = task.periodStart;
                         task.inputTask.periodEnd = task.periodEnd;
                         task.inputTask[flagname] = true;
@@ -94,6 +122,7 @@
                     editedTask(task, flagname) {
                         task.name = task.inputTask.name;
                         task.persons = task.inputTask.persons;
+                        task.priority = task.inputTask.priority;
                         task.periodStart = task.inputTask.periodStart;
                         task.periodEnd = task.inputTask.periodEnd;
                         task.inputTask[flagname] = false;
@@ -127,6 +156,13 @@
                 props: {
                     curtask: Object,
                     persons: Object,
+                }
+            });
+            vueTasks.component('selected-priority', {
+                template: `#selected-priority`,
+                props: {
+                    curtask: Object,
+                    priority: Object,
                 }
             });
             vueTasks.component('edit-persons', {
@@ -210,9 +246,9 @@
                 let reader = new FileReader();
                 reader.onload = function (event) {
                     savedData = JSON.parse(event.target.result);
-                    
+
                     document.title = savedData.title;
-                    vueTasks.$data.status = savedData.status;
+                    //vueTasks.$data.status = savedData.status;
                     vueTasks.$data.persons = savedData.persons;
                     savedData.tasks.forEach(curTask => curTask.inputTask = {});
                     vueTasks.$data.tasks = savedData.tasks;
@@ -224,8 +260,6 @@
             });
         });
 
-
-
         function save() {
             let taskData = _.cloneDeep(vueTasks.$data);
             //delete unnecessary property
@@ -233,11 +267,13 @@
                 delete curTask.inputTask;
             })
             delete tasks.showEditPersons;
+            delete tasks.status;
 
             let blob = new Blob([JSON.stringify(taskData, null, 2)], { type: "text/json;charset=utf-8" });
             saveAs(blob, 'tmt.json');
         }
     </script>
+
     <!-- select person component start-->
     <script type="text/x-template" id="selected-persons">
         <aside @click="$emit('close')"
@@ -276,6 +312,47 @@
     </aside>
     </script>
     <!-- select person component end-->
+
+    <!-- select priority component start-->
+    <script type="text/x-template" id="selected-priority">
+        <aside @click="$emit('close')"
+            class="block flex justify-center items-center
+                fixed top-0 left-0 w-screen h-screen bg-gray-400/70 duration-500 ease-out z-50">
+        <div onclick="event.stopPropagation()"
+            class="p-4 max-w-md bg-white rounded-lg border shadow-md sm:p-8 dark:bg-gray-800 dark:border-gray-700">
+            <div class="flex justify-between items-center mb-4">
+                <h3 class="text-xl font-bold leading-none text-gray-900 dark:text-white">
+                    Select Priority
+                </h3>
+                <i class="cursor-pointer ml-4 fa-solid fa-rectangle-xmark text-stone-400 hover:text-stone-900" @click="$emit('close')"></i>
+                <i class="cursor-pointer ml-2 fa-solid fa-floppy-disk text-stone-400 hover:text-stone-900" @click="$emit('editedtask',curtask)"></i>
+            </div>
+            <div class="flow-root">
+                <ul role="list" class="divide-y divide-gray-200 dark:divide-gray-700">
+                    <li v-for="curPriority in priority" class="py-3 sm:py-4">
+                        <label class="block flex items-center space-x-4">
+                            <div class="flex-shrink-0">
+                                <div class="h-8 w-8 rounded-full bg-white flex justify-center items-center"
+                                    :class="curPriority.bg_color">
+                                    <span class="text-xl" :class="curPriority.txt_color">
+                                        {{ curPriority.name }}
+                                    </span>
+                                </div>
+                            </div>
+                            <div
+                                class="inline-flex items-center text-base font-semibold text-gray-900 dark:text-white">
+                                <input type="radio" :value="curPriority.name" v-model="curtask.inputTask.priority"/>
+                            </div>
+                        </label>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </aside>
+    </script>
+    <!-- select priority component end-->
+
+
     <!-- edit persons component start -->
     <script type="text/x-template" id="edit-persons">
         <aside @click="$emit('close')"
@@ -447,10 +524,10 @@
     <main class="container mx-auto px-4 sm:px-8 py-8" id="tasks" v-cloak>
         <h2 class="text-2xl font-semibold leading-tight">{{ title }}</h2>
         <div class="my-2 flex flex-row items-stretch">
-            <div class="flex flex-row mb-1 sm:mb-0">
+            <div class="flex flex-row mb-0">
                 <div>
                     <select class=" h-full block
-                        rounded-l border-t  rounded-r-none border-r-0
+                        rounded-l border  rounded-r-none border-r-0
                         bg-white overflow-hidden
                         border-gray-400 text-gray-700 
                         py-2 px-4 pr-8 leading-tight 
@@ -489,6 +566,16 @@
                         <th
                             class="px-5 border-b-2 border-gray-200 bg-gray-100 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider w-80">
                             Task
+                        </th>
+                        <th
+                            class="px-5 border-b-2 border-gray-200 bg-gray-100 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider group relative">
+                            Priority
+                            <i class="cursor-pointer absolute top-2 right-8
+                            group-hover:visible invisible
+                            fa-solid fa-sort-up text-stone-400 hover:text-stone-900"></i>
+                            <i class="cursor-pointer absolute top-2 right-4
+                            group-hover:visible invisible
+                            fa-solid fa-sort-down text-stone-400 hover:text-stone-900"></i>
                         </th>
                         <th
                             class="px-5 border-b-2 border-gray-200 bg-gray-100 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
@@ -545,6 +632,28 @@
                                     class="cursor-pointer ml-2 fa-solid fa-floppy-disk text-stone-400 hover:text-stone-900"></i>
                             </div>
                         </td>
+                        <!-- priority ref -->
+                        <td class="px-5 border-b border-gray-200 bg-white text-sm group relative">
+                            <span v-if="getObject(priority, curTask.priority)"
+                                class="relative w-28 inline-block px-3 py-1 font-semibold leading-tight"
+                                :class="getObject(priority, curTask.priority).txt_color">
+                                <span aria-hidden class="absolute inset-0 opacity-50 rounded-full"
+                                    :class="getObject(priority, curTask.priority).bg_color"></span>
+                                <span class="relative">{{ curTask.priority }}</span>
+                            </span>
+                            <!-- edit priority button -->
+                            <i @click="editTask(curTask, 'isEditTaskPriority')" class="cursor-pointer absolute top-2 right-4
+                                        group-hover:visible invisible
+                                        fa-solid fa-pen-to-square text-stone-400 hover:text-stone-900"></i>
+                            <transition enter-active-class="duration-200 ease-out "
+                                enter-from-class="transform opacity-0" enter-to-class="opacity-100"
+                                leave-active-class="duration-200 ease-in" leave-from-class="opacity-100"
+                                leave-to-class="transform opacity-0">
+                                <selected-priority v-show="curTask.inputTask.isEditTaskPriority" :priority="priority"
+                                    :curtask="curTask" @close="cancelEditTask(curTask, 'isEditTaskPriority')"
+                                    @editedtask="editedTask($event,'isEditTaskPriority')" />
+                            </transition>
+                        </td>
                         <!-- persons ref -->
                         <td class="px-5 border-b border-gray-200 bg-white text-sm group relative">
                             <div class="flex items-center">
@@ -597,7 +706,6 @@
                                     class="cursor-pointer fa-solid fa-rectangle-xmark text-stone-400 hover:text-stone-900"></i>
                                 <i @click="editedTask(curTask, 'isEditPeriod')"
                                     class="cursor-pointer ml-2 fa-solid fa-floppy-disk text-stone-400 hover:text-stone-900"></i>
-
                             </div>
                         </td>
                         <!-- status ref-->

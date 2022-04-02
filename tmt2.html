@@ -107,6 +107,13 @@
                             }
                         );
                     },
+                    sortTask(){
+                        const sorByStatus = (a, b) =>{ this.status.indexOf(a.status) > this.status.indexOf(b.status) }
+                        const sorByName = (a, b) =>{ a.name > b.name }
+                        
+                        this.tasks.sort(sorByName).reverse
+                        console.log('sorted')
+                    },
                     editTask(task, flagname) {
                         task.inputTask.name = task.name;
                         task.inputTask.persons = task.persons;
@@ -570,10 +577,11 @@
                         <th
                             class="px-5 border-b-2 border-gray-200 bg-gray-100 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider group relative">
                             Priority
-                            <i class="cursor-pointer absolute top-2 right-10
+                            <!-- priority sort button -->
+                            <i @click="sortTask()" class="cursor-pointer absolute top-2 right-10
                             group-hover:visible invisible
                             fa-solid fa-sort-up text-stone-400 hover:text-stone-900"></i>
-                            <i class="cursor-pointer absolute top-2 right-4
+                            <i @click="sortTask()" class="cursor-pointer absolute top-2 right-4
                             group-hover:visible invisible
                             fa-solid fa-sort-down text-stone-400 hover:text-stone-900"></i>
                         </th>

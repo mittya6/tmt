@@ -306,8 +306,10 @@
             delete tasks.showEditPersons;
             delete tasks.status;
 
+            const filename = dayjs(new Date()).format('YYYYMMDD_HHmmss') + 'tmt.json'
+
             let blob = new Blob([JSON.stringify(taskData, null, 2)], { type: "text/json;charset=utf-8" });
-            saveAs(blob, 'tmt.json');
+            saveAs(blob, filename);
         }
     </script>
 

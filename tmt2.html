@@ -107,12 +107,42 @@
                             }
                         );
                     },
-                    sortTask(){
-                        const sorByStatus = (a, b) =>{ this.status.indexOf(a.status) > this.status.indexOf(b.status) }
-                        const sorByName = (a, b) =>{ a.name > b.name }
-                        
-                        this.tasks.sort(sorByName).reverse
-                        console.log('sorted')
+                    sortTaskByName(reversed) {
+                        const sortByName = (a, b) => {
+                            if (a.name > b.name) {
+                                return 1
+                            } else if (a.name < b.name) {
+                                return -1
+                            }
+                            return 0
+                        }
+                        this.tasks.sort(sortByName)
+                        if (reversed) {
+                            this.tasks.reverse()
+                        }
+                    },
+                    sortTaskByPriority(reversed) {
+                        const tarPriority = this.priority.map((a) => a.name)
+                        const sortByPriority = (a, b) => tarPriority.indexOf(a.priority) - tarPriority.indexOf(b.priority)
+                        this.tasks.sort(sortByPriority)
+                        if (reversed) {
+                            this.tasks.reverse()
+                        }
+                    },
+                    sortTaskByStatus(reversed) {
+                        const tarStatus = this.status.map((a) => a.name)
+                        const sortByStatus = (a, b) => tarStatus.indexOf(a.comments.slice(-1)[0].status) - tarStatus.indexOf(b.comments.slice(-1)[0].status)
+                        this.tasks.sort(sortByStatus)
+                        if (reversed) {
+                            this.tasks.reverse()
+                        }
+                    },
+                    sortTaskByProgress(reversed) {
+                        const sortByProgress = (a, b) => b.comments.slice(-1)[0].progress - a.comments.slice(-1)[0].progress
+                        this.tasks.sort(sortByProgress)
+                        if (reversed) {
+                            this.tasks.reverse()
+                        }
                     },
                     editTask(task, flagname) {
                         task.inputTask.name = task.name;
@@ -571,17 +601,24 @@
                 <thead>
                     <tr>
                         <th
-                            class="px-5 border-b-2 border-gray-200 bg-gray-100 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider w-80">
+                            class="px-5 border-b-2 border-gray-200 bg-gray-100 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider w-80 group relative">
                             Task
+                            <!-- priority sort button -->
+                            <i @click="sortTaskByName(true)" class="cursor-pointer absolute top-2 right-10
+                                                        group-hover:visible invisible
+                                                        fa-solid fa-sort-up text-stone-400 hover:text-stone-900"></i>
+                            <i @click="sortTaskByName()" class="cursor-pointer absolute top-2 right-4
+                                                        group-hover:visible invisible
+                                                        fa-solid fa-sort-down text-stone-400 hover:text-stone-900"></i>
                         </th>
                         <th
                             class="px-5 border-b-2 border-gray-200 bg-gray-100 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider group relative">
                             Priority
                             <!-- priority sort button -->
-                            <i @click="sortTask()" class="cursor-pointer absolute top-2 right-10
+                            <i @click="sortTaskByPriority(true)" class="cursor-pointer absolute top-2 right-10
                             group-hover:visible invisible
                             fa-solid fa-sort-up text-stone-400 hover:text-stone-900"></i>
-                            <i @click="sortTask()" class="cursor-pointer absolute top-2 right-4
+                            <i @click="sortTaskByPriority()" class="cursor-pointer absolute top-2 right-4
                             group-hover:visible invisible
                             fa-solid fa-sort-down text-stone-400 hover:text-stone-900"></i>
                         </th>
@@ -594,12 +631,26 @@
                             Period
                         </th>
                         <th
-                            class="px-5 py-3 border-b-2 border-gray-200 bg-gray-100 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
+                            class="px-5 py-3 border-b-2 border-gray-200 bg-gray-100 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider group relative">
                             Status
+                            <!-- progress sort button -->
+                            <i @click="sortTaskByStatus(true)" class="cursor-pointer absolute top-2 right-10
+                                                        group-hover:visible invisible
+                                                        fa-solid fa-sort-up text-stone-400 hover:text-stone-900"></i>
+                            <i @click="sortTaskByStatus()" class="cursor-pointer absolute top-2 right-4
+                                                        group-hover:visible invisible
+                                                        fa-solid fa-sort-down text-stone-400 hover:text-stone-900"></i>
                         </th>
                         <th
-                            class="px-5 py-3 border-b-2 border-gray-200 bg-gray-100 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
+                            class="px-5 py-3 border-b-2 border-gray-200 bg-gray-100 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider group relative">
                             Progress
+                            <!-- progress sort button -->
+                            <i @click="sortTaskByProgress(true)" class="cursor-pointer absolute top-2 right-10
+                                                        group-hover:visible invisible
+                                                        fa-solid fa-sort-up text-stone-400 hover:text-stone-900"></i>
+                            <i @click="sortTaskByProgress()" class="cursor-pointer absolute top-2 right-4
+                                                        group-hover:visible invisible
+                                                        fa-solid fa-sort-down text-stone-400 hover:text-stone-900"></i>
                         </th>
                         <th
                             class="px-5 py-3 border-b-2 border-gray-200 bg-gray-100 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">

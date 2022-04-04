@@ -29,7 +29,12 @@
 
     <script src="https://unpkg.com/vue@next"></script>
 
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/mermaid/8.14.0/mermaid.min.js"
+        integrity="sha512-vLumCjg7NKEQKGM+xAgBYTvQ90DVu6Eo7vS1T/iPf2feNLcrpGxvumuUUmE3CPiCUPgviyKbtpWGDbhnVnmJxg=="
+        crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+
     <script>
+        mermaid.initialize({ startOnLoad: false });
         let vueTasks;
         window.addEventListener('DOMContentLoaded', (event) => {
 
@@ -39,12 +44,14 @@
                         title: 'CC-Voice',
                         tasks: [],
                         showEditPersons: false,
+                        showGantt:false,
                         persons: [],
                         status: [
                             {
                                 name: 'Active',
                                 txt_color: 'text-sky-900',
-                                bg_color: 'bg-sky-200'
+                                bg_color: 'bg-sky-200',
+                                mermaid: 'active'
                             },
                             {
                                 name: 'Inactive',
@@ -54,7 +61,8 @@
                             {
                                 name: 'Completed',
                                 txt_color: 'text-stone-900',
-                                bg_color: 'bg-stone-200'
+                                bg_color: 'bg-stone-200',
+                                mermaid: 'done'
                             }
                         ],
                         priority: [
@@ -109,8 +117,8 @@
                     },
                     sortTaskByName(reversed, tarName) {
                         const sortByName = (a, b) => {
-                            const aValue = a[tarName]?a[tarName]:null;
-                            const bValue = b[tarName]?b[tarName]:null;
+                            const aValue = a[tarName] ? a[tarName] : null;
+                            const bValue = b[tarName] ? b[tarName] : null;
 
                             if (aValue > bValue) {
                                 return 1
@@ -187,6 +195,27 @@
                     },
                     getObject(tarData, userName) {
                         return tarData.find(tarUser => tarUser.name == userName);
+                    },
+                    renderGantt(){
+                        const definitionArray = []
+                        definitionArray.push('gantt');
+                        definitionArray.push(`title ${this.title}`);
+                        definitionArray.push('dateFormat  YYYY-MM-DD');
+                        
+                        this.tasks.forEach((curTask) =>{
+                            const tarStatus = this.status.find( (curStatus) => curStatus.name == curTask.comments.slice(-1)[0].status)
+                            console.log(tarStatus.mermaid)
+                            if(tarStatus.mermaid){
+                                definitionArray.push(`${curTask.name} :${tarStatus.mermaid}, ${curTask.periodStart}, ${curTask.periodEnd}`);
+                            }else{
+                                definitionArray.push(`${curTask.name} :${curTask.periodStart}, ${curTask.periodEnd}`);
+                            }
+                        })
+                        let insertSvg = function (svgCode, bindFunctions) {
+                            document.querySelector('#gantt').innerHTML = svgCode
+                        };
+                        let graph = mermaid.render('svgId', definitionArray.join('\r\n'),insertSvg);
+                        this.showGantt = true
                     }
                 },
                 created: function () {
@@ -279,6 +308,13 @@
                     this.inputComment.progress = this.curtask.comments[this.curtask.comments.length - 1].progress;
                     this.inputComment.status = this.curtask.comments[this.curtask.comments.length - 1].status;
                     this.inputComment.person = this.curtask.comments[this.curtask.comments.length - 1].person;
+                }
+            });
+            vueTasks.component('show-gantt', {
+                template: `#show-gantt`,
+                props: {
+                    curtask: Object,
+                    priority: Object,
                 }
             });
             vueTasks = vueTasks.mount('#tasks');
@@ -558,6 +594,17 @@
     </aside>
     </script>
     <!-- comments list component end -->
+
+    <!-- show gantt component start -->
+    <script type="text/x-template" id="show-gantt">
+        <aside @click="$emit('close')"
+            class="block flex justify-center items-center
+                fixed top-0 left-0 w-screen h-screen bg-gray-400/70 duration-500 ease-out z-50">
+            <div id="gantt" class="m-16 bg-white"></div>
+        </aside>
+    </script>
+    <!-- show gantt component end -->
+
     <style>
         [v-cloak] {
             display: none;
@@ -601,6 +648,13 @@
                 <div @click="showEditPersons = true"
                     class="cursor-pointer w-10 h-10 rounded-full border border-stone-400 text-stone-400 hover:text-stone-900 flex items-center justify-center">
                     <i class="fa-solid fa-user-plus"></i>
+                </div>
+            </div>
+            <div class="ml-4">
+                <!-- show gantt button -->
+                <div @click="renderGantt()"
+                    class="cursor-pointer w-10 h-10 rounded-full border border-stone-400 text-stone-400 hover:text-stone-900 flex items-center justify-center">
+                    <i class="fa-solid fa-chart-bar"></i>
                 </div>
             </div>
         </div>
@@ -865,6 +919,11 @@
             enter-to-class="opacity-100 translate-y-0" leave-active-class="duration-200 ease-in"
             leave-from-class="opacity-100" leave-to-class="transform opacity-0">
             <edit-persons v-show="showEditPersons" @close="showEditPersons = false" :persons="persons" />
+        </transition>
+        <transition enter-active-class="duration-300 ease-out " enter-from-class="transform opacity-0 -translate-y-2"
+            enter-to-class="opacity-100 translate-y-0" leave-active-class="duration-200 ease-in"
+            leave-from-class="opacity-100" leave-to-class="transform opacity-0">
+            <show-gantt v-show="showGantt" @close="showGantt = false" />
         </transition>
     </main>
 

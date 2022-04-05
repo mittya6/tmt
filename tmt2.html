@@ -33,6 +33,9 @@
         integrity="sha512-vLumCjg7NKEQKGM+xAgBYTvQ90DVu6Eo7vS1T/iPf2feNLcrpGxvumuUUmE3CPiCUPgviyKbtpWGDbhnVnmJxg=="
         crossorigin="anonymous" referrerpolicy="no-referrer"></script>
 
+        <script src="https://cdn.jsdelivr.net/npm/fullcalendar@5.10.2/main.min.js"></script>
+        <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/fullcalendar@5.10.2/main.min.css">
+
     <script>
         mermaid.initialize({ startOnLoad: false });
         let vueTasks;
@@ -44,7 +47,8 @@
                         title: 'CC-Voice',
                         tasks: [],
                         showEditPersons: false,
-                        showGantt:false,
+                        showGantt: false,
+                        showCalendar: false,
                         persons: [],
                         status: [
                             {
@@ -196,26 +200,50 @@
                     getObject(tarData, userName) {
                         return tarData.find(tarUser => tarUser.name == userName);
                     },
-                    renderGantt(){
+                    renderGantt() {
                         const definitionArray = []
                         definitionArray.push('gantt');
                         definitionArray.push(`title ${this.title}`);
                         definitionArray.push('dateFormat  YYYY-MM-DD');
-                        
-                        this.tasks.forEach((curTask) =>{
-                            const tarStatus = this.status.find( (curStatus) => curStatus.name == curTask.comments.slice(-1)[0].status)
-                            console.log(tarStatus.mermaid)
-                            if(tarStatus.mermaid){
+
+                        this.tasks.forEach((curTask) => {
+                            if (!curTask.periodStart || !curTask.periodEnd) {
+                                return
+                            }
+                            const tarStatus = this.status.find((curStatus) => curStatus.name == curTask.comments.slice(-1)[0].status)
+                            if (tarStatus.mermaid) {
                                 definitionArray.push(`${curTask.name} :${tarStatus.mermaid}, ${curTask.periodStart}, ${curTask.periodEnd}`);
-                            }else{
+                            } else {
                                 definitionArray.push(`${curTask.name} :${curTask.periodStart}, ${curTask.periodEnd}`);
                             }
                         })
                         let insertSvg = function (svgCode, bindFunctions) {
                             document.querySelector('#gantt').innerHTML = svgCode
                         };
-                        let graph = mermaid.render('svgId', definitionArray.join('\r\n'),insertSvg);
+                        let graph = mermaid.render('svgId', definitionArray.join('\r\n'), insertSvg);
                         this.showGantt = true
+                    },
+                    rendarCalendar() {
+                        const events = []
+                        this.tasks.forEach((curTask) => {
+                            if (!curTask.periodStart || !curTask.periodEnd) {
+                                return
+                            }
+                            events.push({
+                                title: curTask.name,
+                                start: curTask.periodStart,
+                                end: curTask.periodEnd,
+                            })
+                        })
+                        const calendarEl = document.querySelector('#calendar');
+                        calendarEl.innerHTML = ''
+                        const calendar = new FullCalendar.Calendar(calendarEl, {
+                            initialView: 'dayGridMonth',
+                            events: events,
+                            height: '100%',
+                        });
+                        calendar.render()
+                        this.showCalendar = true
                     }
                 },
                 created: function () {
@@ -311,11 +339,10 @@
                 }
             });
             vueTasks.component('show-gantt', {
-                template: `#show-gantt`,
-                props: {
-                    curtask: Object,
-                    priority: Object,
-                }
+                template: `#show-gantt`
+            });
+            vueTasks.component('show-calendar', {
+                template: `#show-calendar`
             });
             vueTasks = vueTasks.mount('#tasks');
 
@@ -600,7 +627,19 @@
         <aside @click="$emit('close')"
             class="block flex justify-center items-center
                 fixed top-0 left-0 w-screen h-screen bg-gray-400/70 duration-500 ease-out z-50">
-            <div id="gantt" class="m-16 bg-white"></div>
+            <div id="gantt" class="m-16 bg-white" onclick="event.stopPropagation()"></div>
+        </aside>
+    </script>
+    <!-- show gantt component end -->
+
+    <!-- show gantt component start -->
+    <script type="text/x-template" id="show-calendar">
+        <aside @click="$emit('close')"
+            class="block flex justify-center items-center
+                fixed top-0 left-0 w-screen h-screen bg-gray-400/70 duration-500 ease-out z-50">
+            <div class="bg-white w-5/6 h-5/6 p-8">
+                <div class="" id="calendar" onclick="event.stopPropagation()"></div>
+            </div>
         </aside>
     </script>
     <!-- show gantt component end -->
@@ -655,6 +694,13 @@
                 <div @click="renderGantt()"
                     class="cursor-pointer w-10 h-10 rounded-full border border-stone-400 text-stone-400 hover:text-stone-900 flex items-center justify-center">
                     <i class="fa-solid fa-chart-bar"></i>
+                </div>
+            </div>
+            <div class="ml-4">
+                <!-- show gantt button -->
+                <div @click="rendarCalendar()"
+                    class="cursor-pointer w-10 h-10 rounded-full border border-stone-400 text-stone-400 hover:text-stone-900 flex items-center justify-center">
+                    <i class="fa-solid fa-calendar-days"></i>
                 </div>
             </div>
         </div>
@@ -924,6 +970,11 @@
             enter-to-class="opacity-100 translate-y-0" leave-active-class="duration-200 ease-in"
             leave-from-class="opacity-100" leave-to-class="transform opacity-0">
             <show-gantt v-show="showGantt" @close="showGantt = false" />
+        </transition>
+        <transition enter-active-class="duration-300 ease-out " enter-from-class="transform opacity-0 -translate-y-2"
+            enter-to-class="opacity-100 translate-y-0" leave-active-class="duration-200 ease-in"
+            leave-from-class="opacity-100" leave-to-class="transform opacity-0">
+            <show-calendar v-show="showCalendar" @close="showCalendar = false" />
         </transition>
     </main>
 

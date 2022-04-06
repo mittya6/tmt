@@ -203,6 +203,8 @@
                     renderGantt() {
                         const definitionArray = []
                         definitionArray.push('gantt');
+                        definitionArray.push('excludes weekends');
+                        definitionArray.push('axisFormat %m/%d');
                         definitionArray.push(`title ${this.title}`);
                         definitionArray.push('dateFormat  YYYY-MM-DD');
 
